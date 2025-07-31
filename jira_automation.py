@@ -26,6 +26,18 @@ JQL = os.getenv("JIRA_JQL")
 OLLAMA_URL = "http://localhost:11434/api/generate"
 
 
+JIRA_Project_Name_Mapping={
+    "Index of NCI Studies": "INS",
+    "Childhood Cancer Data Catalog": "CCDC(PODS)",
+    "CCDI Hub": "CCDI Protal(aka,CCDI Hub))",
+    "CCDI C3DC": "C3DC",
+    "CCDI CPI": "CPI",
+    "CCDI Federation": "FEDERATION",
+    "CCDI cBioPortal": "cBioPortal",
+    "NCI Data Sharing Hub": "NCI Data Sharing",
+    "Population Science Data Commons": "POPSCI",
+    "Clinical and Translational Data Commons": "CTDC",
+}
 class JiraToDocxAutomation:
     """
     Main automation class for JIRA to DOCX reporting
@@ -355,7 +367,7 @@ Please return ONLY a valid JSON array of deliverables in this exact format:
                 
                 # Format dates and add project name to deliverables
                 for deliverable in deliverables:
-                    deliverable["subproject"] = project_name
+                    deliverable["subproject"] = JIRA_Project_Name_Mapping[project_name] if project_name in JIRA_Project_Name_Mapping else project_name,
                     deliverable["due_date"] = self._format_date(deliverable.get("due_date", "No due date"))
                     deliverable["date_updated"] = self._format_date(deliverable.get("date_updated", "Unknown"))
                 
@@ -407,7 +419,7 @@ Please return ONLY a valid JSON array of deliverables in this exact format:
             # Filter for deliverable-type issues
             if any(keyword in issue_type for keyword in deliverable_keywords):
                 deliverable = {
-                    "subproject": project_name,
+                    "subproject": JIRA_Project_Name_Mapping[project_name] if project_name in JIRA_Project_Name_Mapping else project_name,
                     "deliverable_name": issue.get("summary", "No summary"),
                     "due_date": self._format_date(issue.get("duedate", "No due date")),
                     "date_updated": self._format_date(issue.get("updated", "Unknown")),
@@ -458,7 +470,7 @@ Please return ONLY a valid JSON array of deliverables in this exact format:
                 for deliverable in deliverables:
                     print(f"Adding deliverable to table: {deliverable}")
                     row_cells = deliverable_table.add_row().cells
-                    row_cells[0].text = project_name
+                    row_cells[0].text = JIRA_Project_Name_Mapping[project_name] if project_name in JIRA_Project_Name_Mapping else project_name,
                     row_cells[1].text = str(deliverable.get("deliverable_name", "No name"))
                     row_cells[2].text = str(deliverable.get("due_date", "No due date"))
                     row_cells[3].text = str(deliverable.get("date_updated", "Unknown"))
